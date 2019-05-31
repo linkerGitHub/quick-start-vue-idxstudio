@@ -93,36 +93,34 @@ export default {
   name: 'ThePatchDeal',
   beforeMount: function () {
   },
+  props: {
+    patchOptions: {
+      type: Object
+    }
+  },
   methods: {
     opButtonStyleSet: function (opName) {
-      let propAttrs = this.$attrs
       let innerStyle = ''
-      innerStyle += propAttrs.patchOptions.ops.indexOf(opName) === -1 ? 'display: none' : ''
+      innerStyle += this.patchOptions.ops.indexOf(opName) === -1 ? 'display: none' : ''
       return innerStyle
     },
     handleEdit: function () {
-      let propAttrs = this.$attrs
-      propAttrs.patchOptions.opEvent.edit()
+      this.patchOptions.opEvent.edit()
     },
     handleEnable: function () {
-      let propAttrs = this.$attrs
-      propAttrs.patchOptions.opEvent.enable()
+      this.patchOptions.opEvent.enable()
     },
     handleDisable: function () {
-      let propAttrs = this.$attrs
-      propAttrs.patchOptions.opEvent.disable()
+      this.patchOptions.opEvent.disable()
     },
     handleDelete: function () {
-      let propAttrs = this.$attrs
-      propAttrs.patchOptions.opEvent.delete()
+      this.patchOptions.opEvent.delete()
     },
     handleNewOne: function () {
-      let propAttrs = this.$attrs
-      propAttrs.patchOptions.opEvent.newOne()
+      this.patchOptions.opEvent.newOne()
     },
     handleRefresh: function () {
-      let propAttrs = this.$attrs
-      propAttrs.patchOptions.opEvent.refresh()
+      this.patchOptions.opEvent.refresh()
     }
   },
   data () {

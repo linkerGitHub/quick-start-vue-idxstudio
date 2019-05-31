@@ -2,9 +2,8 @@ import qs from 'qs'
 import { Axios as idxAxios } from '../axios'
 
 class RESTfulReq {
-  constructor (reqUrl, theTab) {
+  constructor (reqUrl) {
     this.reqUrl = reqUrl
-    this.tab = theTab
   }
 
   /**
@@ -12,43 +11,70 @@ class RESTfulReq {
    * @param suffixUrl
    * @param url
    * @param query
-   * @param callBack
    */
-  getReq (query, callBack, suffixUrl = '', url = this.reqUrl + suffixUrl) {
-    idxAxios.get(url + '?' + qs.stringify(query))
-      .then(function (response) {
-        callBack(response)
+  getReq (query, suffixUrl = '', url = this.reqUrl + suffixUrl) {
+    return new Promise((resolve, reject) => {
+      idxAxios.get(url + '?' + qs.stringify(query))
+        .then(function (response) {
+          resolve(response)
+        }).catch(function (error) {
+        reject(error)
       })
+    })
   }
 
   /**
-   * 新建条目
+   * post 请求
+   * @param formData
+   * @param suffixUrl
+   * @param url
+   * @returns {Promise<any>}
    */
-  postReq (formData, callBack, suffixUrl = '', url = this.reqUrl + suffixUrl) {
-    idxAxios.post(url, formData)
-      .then(function (response) {
-        callBack(response)
+  postReq (formData, suffixUrl = '', url = this.reqUrl + suffixUrl) {
+    return new Promise((resolve, reject) => {
+      idxAxios.post(url, formData)
+        .then(function (response) {
+          resolve(response)
+        }).catch(function (error) {
+        reject(error)
       })
+    })
   }
 
   /**
-   * 更新条目
+   * put 请求
+   * @param formData
+   * @param suffixUrl
+   * @param url
+   * @returns {Promise<any>}
    */
-  putReq (formData, callBack, suffixUrl = '', url = this.reqUrl + suffixUrl) {
-    idxAxios.put(url, formData)
-      .then(function (response) {
-        callBack(response)
+  putReq (formData, suffixUrl = '', url = this.reqUrl + suffixUrl) {
+    return new Promise((resolve, reject) => {
+      idxAxios.put(url, formData)
+        .then(function (response) {
+          resolve(response)
+        }).catch(function (error) {
+        reject(error)
       })
+    })
   }
 
   /**
-   * 删除条目
+   * delete 请求
+   * @param query
+   * @param suffixUrl
+   * @param url
+   * @returns {Promise<any>}
    */
-  deleteReq (query, callBack, suffixUrl = '', url = this.reqUrl + suffixUrl) {
-    idxAxios.delete(url + '?' + qs.stringify(query))
-      .then(function (response) {
-        callBack(response)
+  deleteReq (query, suffixUrl = '', url = this.reqUrl + suffixUrl) {
+    return new Promise((resolve, reject) => {
+      idxAxios.delete(url + '?' + qs.stringify(query))
+        .then(function (response) {
+          resolve(response)
+        }).catch(function (error) {
+        reject(error)
       })
+    })
   }
 }
 
