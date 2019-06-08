@@ -1,9 +1,8 @@
-const serverHost = 'http://tmp_show.idxstudio.win'
+const serverHost = 'http://localhost'
 const url = {
   server: {
-    hostname: 'http://tmp_show.idxstudio.win',
-    api_base: serverHost + '/cms/api',
-    api_admin: serverHost + '/cms/api' + '/admin'
+    hostname: 'http://localhost',
+    api_base: serverHost + '/api'
   }
 }
 

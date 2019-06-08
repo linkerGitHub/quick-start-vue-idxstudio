@@ -13,8 +13,11 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
+import CKEditor from '@ckeditor/ckeditor5-vue'
+
 Vue.use(ElementUI)
 Vue.use(idxAxios)
+Vue.use(CKEditor)
 
 library.add(fas)
 

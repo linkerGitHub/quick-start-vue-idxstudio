@@ -34,12 +34,13 @@ const normal = [
     path: '/Login',
     name: 'login',
     component: normalVies.Login
-  },
+  }
+  /*,
   {
     path: '/Logout',
     name: 'logout',
     component: normalVies.Logout
-  }
+  } */
 ]
 
 export {
