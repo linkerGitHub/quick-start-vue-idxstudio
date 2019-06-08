@@ -13,8 +13,10 @@ Axios.interceptors.request.use(
     if (
       config.method === 'post' || config.method === 'put'
     ) {
-      // 序列化
-      config.data = qs.stringify(config.data)
+      if (config.headers['Content-type'] !== 'multipart/form-data;charset=UTF-8') {
+        // 序列化
+        config.data = qs.stringify(config.data)
+      }
     }
 
     // 若是有做鉴权token , 就给头部带上token
@@ -42,19 +44,18 @@ Axios.interceptors.request.use(
 Axios.interceptors.response.use(
   res => {
     // 对响应数据做些事
-    if (!res.data.status) {
+    if (res.data.code !== '200') {
       Message({
         //  饿了么的消息弹窗组件,类似toast
         showClose: true,
         message: '[' + res.data.code + ']' + res.data.error,
         type: 'error'
       })
-      return Promise.reject(res.data.error)
+      return Promise.reject(res)
     }
     return res
   },
   error => {
-    console.log()
     // 对响应数据做些事
     if (!error.response.data.status) {
       Message({
@@ -101,8 +102,7 @@ Axios.interceptors.response.use(
       }
     }
     // 返回 response 里的错误信息
-    let errorInfo = error.response.data.error ? error.response.data.error : error.response.data.data.message
-    return Promise.reject(errorInfo)
+    return Promise.reject(error)
   }
 )
 export {

@@ -18,8 +18,8 @@ class RESTfulReq {
         .then(function (response) {
           resolve(response)
         }).catch(function (error) {
-        reject(error)
-      })
+          reject(error)
+        })
     })
   }
 
@@ -36,8 +36,24 @@ class RESTfulReq {
         .then(function (response) {
           resolve(response)
         }).catch(function (error) {
-        reject(error)
-      })
+          reject(error)
+        })
+    })
+  }
+
+  fileUpload (formData, suffixUrl = '', url = this.reqUrl + suffixUrl) {
+    return new Promise((resolve, reject) => {
+      idxAxios.post(url, formData,
+        {
+          headers: {
+            'Content-type': 'multipart/form-data;charset=UTF-8'
+          }
+        })
+        .then(function (response) {
+          resolve(response)
+        }).catch(function (error) {
+          reject(error)
+        })
     })
   }
 
@@ -54,8 +70,8 @@ class RESTfulReq {
         .then(function (response) {
           resolve(response)
         }).catch(function (error) {
-        reject(error)
-      })
+          reject(error)
+        })
     })
   }
 
@@ -72,8 +88,8 @@ class RESTfulReq {
         .then(function (response) {
           resolve(response)
         }).catch(function (error) {
-        reject(error)
-      })
+          reject(error)
+        })
     })
   }
 }
