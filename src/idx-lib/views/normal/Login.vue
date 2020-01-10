@@ -4,10 +4,10 @@
             <h2 class="form-title">登 陆</h2>
             <el-form label-position="right" label-width="50px" :model="formLogin">
                 <el-form-item label="用户">
-                    <el-input v-model="formLogin.admin_name"></el-input>
+                    <el-input v-model="formLogin.user_name"></el-input>
                 </el-form-item>
                 <el-form-item label="密码">
-                    <el-input v-model="formLogin.admin_pass"></el-input>
+                    <el-input v-model="formLogin.user_pass"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="submit()">登陆</el-button>
@@ -18,7 +18,6 @@
 </template>
 
 <script>
-import router from '@/router'
 import RESTfulReq from '../../utils/RESTful-request'
 
 let initObj = {
@@ -28,26 +27,45 @@ let initObj = {
 export default {
   name: 'Login',
   components: {},
+  props: {
+    url: {
+      type: String,
+      default: '/admin/login'
+    },
+    firstStep: {
+      type: Function,
+      default: function () {
+      }
+    },
+    afterLoginSubmit: {
+      type: Function,
+      default: function (response) {
+        window.localStorage.setItem('userInfo', JSON.stringify(response.data.data))
+        this.$store.commit('userInfo', response.data.data)
+        this.$router.push('/newActivity')
+      }
+    }
+  },
   mounted: function () {
+    this.firstStep()
   },
   beforeMount: function () {
     initObj.tab = this
-    initObj.networkReq = new RESTfulReq(this.$attrs.url, initObj.tab)
+    initObj.networkReq = new RESTfulReq(this.url)
   },
   methods: {
     submit: function () {
-      initObj.networkReq.postReq(initObj.tab.formLogin, function (response) {
-        window.localStorage.setItem('loginUserBaseInfo', JSON.stringify(response.data.data))
-        initObj.tab.$attrs.success(response)
-        router.push({ path: '/' })
-      })
+      initObj.networkReq.postReq(initObj.tab.formLogin)
+        .then(function (response) {
+          initObj.tab.afterLoginSubmit(response)
+        })
     }
   },
   data () {
     return {
       formLogin: {
-        admin_name: '',
-        admin_pass: ''
+        user_name: '',
+        user_pass: ''
       }
     }
   },

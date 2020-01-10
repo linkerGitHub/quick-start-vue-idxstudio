@@ -4,7 +4,7 @@
       <span>自定义表单项</span>
     </div>
     <the-manage-table
-      :src-url="'/input_field'"
+      :src-url="'/input_field?status=1'"
       :columns="columnDefine"
       :edit-box-opts="{width: '40%'}"
       :ops="['edit', 'delete', 'refresh', 'newOne']"
@@ -37,12 +37,6 @@ export default {
     return {
       columnDefine: [
         {
-          prop: 'id',
-          label: 'id',
-          width: '45px',
-          editable: false
-        },
-        {
           prop: 'input_label',
           label: '标签'
         },
@@ -52,7 +46,10 @@ export default {
         },
         {
           prop: 'input_require',
-          label: '是否必填'
+          label: '是否必填',
+          contentExpress: function (val) {
+            return val === '1' ? '是' : '否'
+          }
         },
         {
           prop: 'input_valid_regexr',
@@ -65,15 +62,6 @@ export default {
         {
           prop: 'input_err_notice',
           label: '验证错误提示'
-        },
-        {
-          prop: 'input_name_mark',
-          label: '值标识'
-        },
-        {
-          prop: 'status',
-          label: '状态',
-          editable: false
         }
       ]
     }

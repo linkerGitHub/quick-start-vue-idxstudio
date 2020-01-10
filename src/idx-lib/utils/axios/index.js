@@ -13,6 +13,9 @@ Axios.interceptors.request.use(
     if (
       config.method === 'post' || config.method === 'put'
     ) {
+      if (config.data instanceof FormData) {
+        config.headers['Content-type'] = 'multipart/form-data;charset=UTF-8'
+      }
       if (config.headers['Content-type'] !== 'multipart/form-data;charset=UTF-8') {
         // 序列化
         config.data = qs.stringify(config.data)
@@ -23,8 +26,8 @@ Axios.interceptors.request.use(
     // 若是需要跨站点,存放到 cookie 会好一点,限制也没那么多,有些浏览环境限制了 localstorage 的使用
     // 这里localStorage一般是请求成功后我们自行写入到本地的,因为你放在vuex刷新就没了
     // 一些必要的数据写入本地,优先从本地读取
-    if (localStorage.loginUserBaseInfo) {
-      config.headers.Authorization = JSON.parse(localStorage.loginUserBaseInfo).token
+    if (localStorage.userInfo) {
+      config.headers.Authorization = JSON.parse(localStorage.userInfo).tokenValue
     }
     return config
   },
@@ -57,7 +60,7 @@ Axios.interceptors.response.use(
   },
   error => {
     // 对响应数据做些事
-    if (!error.response.data.status) {
+    if (error.response.data.code !== '200') {
       Message({
         //  饿了么的消息弹窗组件,类似toast
         showClose: true,
@@ -65,41 +68,31 @@ Axios.interceptors.response.use(
         type: 'error'
       })
     }
-
-    // 用户登录的时候会拿到一个基础信息,比如用户名,token,过期时间戳
-    // 直接丢localStorage或者sessionStorage
-    if (!window.localStorage.getItem('loginUserBaseInfo')) {
-      // 若是接口访问的时候没有发现有鉴权的基础信息,直接返回登录页
+    // 下面是接口回调的satus ,因为我做了一些错误页面,所以都会指向对应的报错页面
+    if (error.response.data.code === '401') {
       router.push({
-        path: '/Login'
+        path: '/error/401'
       })
-    } else {
-      // 下面是接口回调的satus ,因为我做了一些错误页面,所以都会指向对应的报错页面
-      if (error.response.status === 401) {
-        router.push({
-          path: '/error/401'
-        })
-      }
-      if (error.response.status === 403) {
-        router.push({
-          path: '/error/403'
-        })
-      }
-      if (error.response.status === 500) {
-        router.push({
-          path: '/error/500'
-        })
-      }
-      if (error.response.status === 502) {
-        router.push({
-          path: '/error/502'
-        })
-      }
-      if (error.response.status === 404) {
-        router.push({
-          path: '/error/404'
-        })
-      }
+    }
+    if (error.response.data.code === '403') {
+      router.push({
+        path: '/error/403'
+      })
+    }
+    if (error.response.data.code === '500') {
+      router.push({
+        path: '/error/500'
+      })
+    }
+    if (error.response.data.code === '502') {
+      router.push({
+        path: '/error/502'
+      })
+    }
+    if (error.response.data.code === '404') {
+      router.push({
+        path: '/error/404'
+      })
     }
     // 返回 response 里的错误信息
     return Promise.reject(error)

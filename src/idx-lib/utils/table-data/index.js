@@ -17,6 +17,18 @@ class TableDataUtil {
     return ret
   }
 
+  getColumns (columnNames, targetData = this.targetData) {
+    let ret = []
+    for (let item of targetData) {
+      let dealedItem = {}
+      for (let columnName of columnNames) {
+        dealedItem[columnName] = item[columnName]
+      }
+      ret.push(dealedItem)
+    }
+    return ret
+  }
+
   /**
    * 将某一列的值拼接
    * @param columnName
@@ -55,6 +67,42 @@ class TableDataUtil {
       array[index][columnName] = newVal
     })
     return tableData
+  }
+
+  convert2KeyValPlain (keyColumn, valColumn, tableData = this.targetData) {
+    let ret = {}
+    tableData.forEach(function (item, index, array) {
+      let tempArr = {}
+      let reserveKeyArr = valColumn.split('.')
+      let layer = array[index]
+      for (let layerName of reserveKeyArr) {
+        layer = layer[layerName]
+      }
+      tempArr = layer
+      ret[array[index][keyColumn]] = tempArr
+    })
+    return ret
+  }
+
+  convert2KeyVal (keyColumn, reserveColumn = false, tableData = this.targetData) {
+    let ret = {}
+    tableData.forEach(function (item, index, array) {
+      let tempArr = {}
+      if (reserveColumn === false) {
+        tempArr = array[index]
+      } else {
+        for (let reserveKey in reserveColumn) {
+          let reserveKeyArr = reserveKey.split('.')
+          let layer = array[index]
+          for (let layerName of reserveKeyArr) {
+            layer = layer[layerName]
+          }
+          tempArr[reserveColumn[reserveKey]] = layer
+        }
+      }
+      ret[array[index][keyColumn]] = tempArr
+    })
+    return ret
   }
 }
 

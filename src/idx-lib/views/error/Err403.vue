@@ -1,6 +1,7 @@
 <template>
     <div>
-        you don't have permission to access this resource or to do this operation
+        没有访问权限，请登陆后再试。
+      <el-button type="primary" @click="goToLogin">登陆</el-button>
     </div>
 </template>
 
@@ -12,7 +13,13 @@ export default {
   },
   beforeMount: function () {
   },
-  methods: {},
+  methods: {
+    goToLogin: function (e) {
+      this.$router.push({
+        path: '/Login'
+      })
+    }
+  },
   data () {
     return {}
   },

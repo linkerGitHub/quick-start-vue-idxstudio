@@ -1,11 +1,28 @@
 <template>
-  <div>
-    <el-row>
-      <el-col :span="23" style="text-align: right">
+  <div style="position: relative; width: 100%;">
+    <el-row style="padding-bottom: 6px">
+      <el-col :span="3" v-if="colShowSetBtn">
+        <el-popover
+          placement="bottom"
+          v-model="colShowSettingVisible">
+          <div style="text-align: left; margin: 0">
+            <el-checkbox :indeterminate="isIndeterminate" v-model="colShowCheckAll"
+                         @change="handleColShowCheckAllChange">全选
+            </el-checkbox>
+            <div v-for="(col, index) in columns" :key="index">
+              <el-checkbox :label="col.label" v-model="colShow[index]" @change="handleColShowChange($event, index)">{{
+                col.label }}
+              </el-checkbox>
+            </div>
+          </div>
+          <el-button slot="reference" type="primary" :plain="true" icon="el-icon-setting">显示</el-button>
+        </el-popover>
+      </el-col>
+      <el-col :span="20" style="text-align: right">
         <!--建立一个插槽供父组件补充，并将查询数据对象暴露在scope的data中-->
         <slot name="searchBar" :data="searchOperateData"></slot>
       </el-col>
-      <el-col :span="1" v-show="$scopedSlots.searchBar">
+      <el-col :span="1" v-if="$scopedSlots.searchBar">
         <el-button icon="el-icon-search" circle @click="searchQuery()"></el-button>
       </el-col>
     </el-row>
@@ -19,42 +36,46 @@
       <el-table-column v-for="(col, key) of tableOptions.columns"
                        :key="key+1"
                        :prop="col.prop"
-                       :label="col.label"
+                       :class-name="(col.className ? col.className : '') + ' ' + ('tbl-col-' + key) + ' ' + (colShow[key] ? 'col-show' : 'col-hide')"
+                       :label="typeof col.label === 'string' ? col.label : col.label()"
                        :width="col.width">
         <template slot-scope="scope">
           <!--判定是否有根据值自定义内容表达的方法-->
-          <span v-if="col.contentExpress === undefined && !col.dangerouslyUseHTMLString">{{ scope.row[col.prop] }}</span>
+          <span
+            v-if="col.contentExpress === undefined && !col.dangerouslyUseHTMLString">{{ scope.row[col.prop] }}</span>
           <span v-else-if="col.contentExpress === undefined && col.dangerouslyUseHTMLString"
                 v-html="scope.row[col.prop]">
           </span>
           <span v-else-if="col.VNode">
-            <parent-render :expressNode="handleContentExp(scope.row[col.prop], col.contentExpress)"></parent-render>
+            <v-node-render :expressNode="handleContentExp(scope.row[col.prop], col.contentExpress, scope.row)"></v-node-render>
           </span>
           <!--如果有自定义表达方法，判定是以html还是纯粹字符来展示-->
           <span v-else-if="!col.dangerouslyUseHTMLString">
-            {{ handleContentExp(scope.row[col.prop], col.contentExpress) }}
+            {{ handleContentExp(scope.row[col.prop], col.contentExpress, scope.row) }}
           </span>
-          <span v-else v-html="handleContentExp(scope.row[col.prop], col.contentExpress)"></span>
+          <span v-else v-html="handleContentExp(scope.row[col.prop], col.contentExpress, scope.row)"></span>
         </template>
       </el-table-column>
     </el-table>
 
     <!--使用翻页组件-->
     <el-row :style="{'padding-top': '10px'}">
-      <el-pagination
-        background
-        @size-change="handleTableSizeChange"
-        @current-change="handleTableCurrentChange"
-        :current-page="thePaginationOpt.tableCurrentPage"
-        :page-sizes="[5, 20, 50, 100, 300, 500]"
-        :page-size="thePaginationOpt.tablePageSize"
-        layout="total, sizes, prev, pager, next"
-        :total="thePaginationOpt.tableItemTotal">
-      </el-pagination>
-    </el-row>
+      <slot name="pagination" :method="{sizeChange: handleTableSizeChange, currentPageChange: handleTableCurrentChange}" :option="thePaginationOpt" :data="tableOptions.newOneData">
+        <el-pagination
+          background
+          @size-change="handleTableSizeChange"
+          @current-change="handleTableCurrentChange"
+          :current-page="thePaginationOpt.tableCurrentPage"
+          :page-sizes="[5, 20, 50, 100, 300, 500]"
+          :page-size="thePaginationOpt.tablePageSize"
+          layout="total, sizes, prev, pager, next"
+          :total="thePaginationOpt.tableItemTotal">
+        </el-pagination>
+      </slot>
 
+    </el-row>
     <!--使用侧边操作组件-->
-    <the-patch-deal :patchOptions="patchDeal"></the-patch-deal>
+    <the-patch-deal :patchOptions="patchDeal" :style="patchDealStyle"></the-patch-deal>
 
     <!--编辑操作对话款-->
     <el-dialog
@@ -63,7 +84,7 @@
       :width="editBoxOpts.width"
       :close-on-click-modal="false">
       <!--建立一个插槽供父组件补充，并将编辑操作的数据对像暴露到scope的data中-->
-      <slot name="editForm" :data="tableOptions.editData" >
+      <slot name="editForm" :data="tableOptions.editData">
         <el-form :model="tableOptions.editData" label-width="80px">
           <el-form-item v-for="(cl, index) in editableColumn" :key="index" :label="cl.label">
             <el-input v-model="tableOptions.editData[cl.prop]"></el-input>
@@ -103,11 +124,27 @@
 import ThePatchDeal from './ThePatchDeal'
 import RESTfulReq from '../utils/RESTful-request'
 import TableDataUtil from '../utils/table-data'
+import { Message } from 'element-ui'
 
 export default {
   name: 'TheManageTable',
   components: {
-    ThePatchDeal
+    ThePatchDeal,
+    VNodeRender: {
+      props: {
+        expressNode: {
+          type: Object | Function
+        }
+      },
+      render: function (createElement) {
+        if (typeof (this.expressNode) === 'object') {
+          return this.expressNode
+        }
+        if (typeof (this.expressNode) === 'function') {
+          return this.expressNode(createElement)
+        }
+      }
+    }
   },
   props: {
     // 操作区按钮
@@ -187,6 +224,22 @@ export default {
       validator: function (value) {
         return value() instanceof Promise
       }
+    },
+    modifyReqOverride: {
+      type: Function
+    },
+    newOneReqOverride: {
+      type: Function
+    },
+    colShowSetBtn: {
+      type: Boolean,
+      default: true
+    },
+    patchDealStyle: {
+      type: Object,
+      default: function () {
+        return {}
+      }
     }
   },
   mounted: function () {
@@ -194,10 +247,18 @@ export default {
   beforeMount: function () {
     this.tableDataReq()
     this.patchDeal.ops = this.ops
+    const thisView = this
+    this.columns.forEach(function (item, index, arr) {
+      thisView.$set(thisView.colShow, index, true)
+    })
   },
   data: function () {
     let theTab = this
     return {
+      isIndeterminate: false,
+      colShowCheckAll: true,
+      colShow: {},
+      colShowSettingVisible: false,
       // 表格
       networkReq: new RESTfulReq(theTab.srcUrl),
       tableOptions: {
@@ -218,7 +279,7 @@ export default {
       searchOperateData: {},
       // 操作区
       patchDeal: {
-        ops: ['edit', 'enable', 'disable', 'delete', 'newOne', 'refresh'],
+        ops: this.ops,
         opEvent: {
           edit: function (e) {
             if (theTab.checkSelected()) {
@@ -280,6 +341,24 @@ export default {
     }
   },
   methods: {
+    handleColShowCheckAllChange: function (val) {
+      const thisView = this
+      this.columns.forEach(function (item, index, arr) {
+        thisView.$set(thisView.colShow, index, val)
+      })
+      this.isIndeterminate = false
+    },
+    handleColShowChange: function (val, index) {
+      this.colShow[index] = val
+      let trueCount = 0
+      let falseCount = 0
+      for (let colState in this.colShow) {
+        trueCount += this.colShow[colState] ? 1 : 0
+        falseCount += this.colShow[colState] ? 0 : 1
+      }
+      this.colShowCheckAll = (falseCount === 0)
+      this.isIndeterminate = !(trueCount === 0 || falseCount === 0)
+    },
     /**
        * 表格选择改变事件
        * @param val
@@ -329,25 +408,46 @@ export default {
     newOneReq: function (reqData = this.tableOptions.newOneData) {
       let theTab = this
       theTab.tableOptions.loading = true
-      theTab.networkReq.postReq(reqData)
-        .then(function (response) {
-          theTab.tableOptions.tableData.push(response.data.data)
-          theTab.tableOptions.loading = false
-          theTab.thePaginationOpt.tableItemTotal += 1
-          theTab.newOneBoxSuccess(response, theTab.tableOptions.newOneData)
-          theTab.tableDataReq()
-        })
+      if (theTab.newOneReqOverride) {
+        theTab.newOneReqOverride(reqData)
+          .then(function (response) {
+            theTab.tableOptions.tableData.push(response.data.data)
+            theTab.tableOptions.loading = false
+            theTab.thePaginationOpt.tableItemTotal += 1
+            theTab.newOneBoxSuccess(response, theTab.tableOptions.newOneData)
+            theTab.tableDataReq()
+          })
+      } else {
+        theTab.networkReq.postReq(reqData)
+          .then(function (response) {
+            theTab.tableOptions.tableData.push(response.data.data)
+            theTab.tableOptions.loading = false
+            theTab.thePaginationOpt.tableItemTotal += 1
+            theTab.newOneBoxSuccess(response, theTab.tableOptions.newOneData)
+            theTab.tableDataReq()
+          })
+      }
+
       theTab.newOneBoxToggle(false)
     },
     modifyReq: function (reqData = this.tableOptions.editData) {
       let theTab = this
       theTab.tableOptions.loading = true
-      theTab.networkReq.putReq(reqData)
-        .then(function (response) {
-          theTab.tableOptions.loading = false
-          theTab.editBoxSuccess(response, reqData)
-          theTab.tableDataReq()
-        })
+      if (theTab.modifyReqOverride) {
+        theTab.modifyReqOverride(reqData)
+          .then(function (response) {
+            theTab.tableOptions.loading = false
+            theTab.editBoxSuccess(response, reqData)
+            theTab.tableDataReq()
+          })
+      } else {
+        theTab.networkReq.putReq(reqData)
+          .then(function (response) {
+            theTab.tableOptions.loading = false
+            theTab.editBoxSuccess(response, reqData)
+            theTab.tableDataReq()
+          })
+      }
       theTab.editBoxToggle(false)
     },
     deleteReq: function () {
@@ -381,8 +481,8 @@ export default {
        * @param callBack
        * @returns {*}
        */
-    handleContentExp: function (val, callBack) {
-      return callBack(val, this.$createElement)
+    handleContentExp: function (val, callBack, row) {
+      return callBack(val, this.$createElement, row)
     },
     searchQuery: function () {
       let theTab = this
@@ -418,6 +518,13 @@ export default {
       let theTab = this
       theTab.editBoxBeforeConfirm().then(function (response) {
         theTab.modifyReq()
+      }).catch(function (err) {
+        Message({
+          //  饿了么的消息弹窗组件,类似toast
+          showClose: true,
+          message: err,
+          type: 'error'
+        })
       })
     },
     newOneBoxConfirm: function () {
@@ -446,10 +553,24 @@ export default {
       })
       return ret
     }
+  },
+  watch: {
+    columns: function () {
+      const thisView = this
+      this.columns.forEach(function (item, index, arr) {
+        thisView.$set(thisView.colShow, index, true)
+      })
+    },
+    srcUrl: function (newVal, oldVal) {
+      this.networkReq.setReqUrl(newVal)
+      this.tableDataReq()
+    }
   }
 }
 </script>
 
-<style scoped>
-
+<style>
+  .col-hide {
+    display: none;
+  }
 </style>

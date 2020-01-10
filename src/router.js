@@ -4,7 +4,11 @@ import * as idxRouter from './idx-lib/router'
 import AdminFramework from '@/idx-lib/views/normal/AdminFramework'
 import NewActivity from '@/views/NewActivity'
 import ActivityList from '@/views/ActivityList'
-import InputFieldList from "@/views/InputFieldList";
+import InputFieldList from '@/views/InputFieldList'
+import CheckIn from '@/views/CheckIn'
+import ApplyList from '@/views/ApplyList'
+import AdminList from '@/views/AdminList'
+import UserList from '@/views/UserList'
 
 Vue.use(Router)
 
@@ -37,6 +41,30 @@ export default new Router({
           path: 'formItemList',
           name: 'formItemList',
           component: InputFieldList
+        },
+        {
+          path: 'checkIn/:activity_id',
+          name: 'checkIn',
+          component: CheckIn,
+          props: true
+        },
+        {
+          path: 'applyList/:activity_id',
+          name: 'applyList',
+          component: ApplyList,
+          props: true
+        },
+        {
+          path: 'admin',
+          name: 'adminList',
+          component: AdminList,
+          props: true
+        },
+        {
+          path: 'user',
+          name: 'userList',
+          component: UserList,
+          props: true
         }
       ]
     }

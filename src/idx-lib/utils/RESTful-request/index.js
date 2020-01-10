@@ -1,9 +1,25 @@
-import qs from 'qs'
 import { Axios as idxAxios } from '../axios'
 
 class RESTfulReq {
-  constructor (reqUrl) {
+  constructor (reqUrl, config = {}) {
     this.reqUrl = reqUrl
+    this.config = config
+  }
+
+  setReqUrl (url) {
+    this.reqUrl = url
+  }
+
+  getReqUrl () {
+    return this.url
+  }
+
+  setConfig (config) {
+    this.config = config
+  }
+
+  getConfig () {
+    return this.config
   }
 
   /**
@@ -13,11 +29,15 @@ class RESTfulReq {
    * @param query
    */
   getReq (query, suffixUrl = '', url = this.reqUrl + suffixUrl) {
+    const theObj = this
     return new Promise((resolve, reject) => {
-      idxAxios.get(url + '?' + qs.stringify(query))
-        .then(function (response) {
+      idxAxios.get(url, {
+        params: query,
+        ...theObj.config
+      })
+        .then((response) => {
           resolve(response)
-        }).catch(function (error) {
+        }).catch((error) => {
           reject(error)
         })
     })
@@ -31,27 +51,30 @@ class RESTfulReq {
    * @returns {Promise<any>}
    */
   postReq (formData, suffixUrl = '', url = this.reqUrl + suffixUrl) {
+    const theObj = this
     return new Promise((resolve, reject) => {
-      idxAxios.post(url, formData)
-        .then(function (response) {
+      idxAxios.post(url, formData, theObj.config)
+        .then((response) => {
           resolve(response)
-        }).catch(function (error) {
+        }).catch((error) => {
           reject(error)
         })
     })
   }
 
   fileUpload (formData, suffixUrl = '', url = this.reqUrl + suffixUrl) {
+    const theObj = this
     return new Promise((resolve, reject) => {
       idxAxios.post(url, formData,
         {
           headers: {
             'Content-type': 'multipart/form-data;charset=UTF-8'
-          }
+          },
+          ...theObj.config
         })
-        .then(function (response) {
+        .then((response) => {
           resolve(response)
-        }).catch(function (error) {
+        }).catch((error) => {
           reject(error)
         })
     })
@@ -65,11 +88,12 @@ class RESTfulReq {
    * @returns {Promise<any>}
    */
   putReq (formData, suffixUrl = '', url = this.reqUrl + suffixUrl) {
+    const theObj = this
     return new Promise((resolve, reject) => {
-      idxAxios.put(url, formData)
-        .then(function (response) {
+      idxAxios.put(url, formData, theObj.config)
+        .then((response) => {
           resolve(response)
-        }).catch(function (error) {
+        }).catch((error) => {
           reject(error)
         })
     })
@@ -83,11 +107,16 @@ class RESTfulReq {
    * @returns {Promise<any>}
    */
   deleteReq (query, suffixUrl = '', url = this.reqUrl + suffixUrl) {
+    const theObj = this
     return new Promise((resolve, reject) => {
-      idxAxios.delete(url + '?' + qs.stringify(query))
-        .then(function (response) {
+      idxAxios.delete(url,
+        {
+          params: query,
+          ...theObj.config
+        })
+        .then((response) => {
           resolve(response)
-        }).catch(function (error) {
+        }).catch((error) => {
           reject(error)
         })
     })

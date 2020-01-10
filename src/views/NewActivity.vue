@@ -8,7 +8,7 @@
       v-bind:activityData.sync="actData">
     </activity-edit>
     <div :style="{'padding-left': '120px'}">
-      <el-button type="primary" @click="newAct">确认</el-button>
+      <el-button type="primary" @click="newAct" :loading="confirmLoading">确认</el-button>
     </div>
   </el-card>
 </template>
@@ -17,6 +17,7 @@
 
 import ActivityEdit from '@/components/ActivityEdit'
 import RESTfulReq from '@/idx-lib/utils/RESTful-request'
+import { Message } from 'element-ui'
 
 export default {
   name: 'newActivity',
@@ -31,8 +32,16 @@ export default {
       theTab.$refs['actEdit'].validForm()
         .then(function (res) {
           if (res) {
-            this.req.postReq(theTab.actData)
+            theTab.confirmLoading = true
+            theTab.req.postReq(theTab.actData)
               .then(function (response) {
+                theTab.confirmLoading = false
+                Message({
+                  //  饿了么的消息弹窗组件,类似toast
+                  showClose: true,
+                  message: response.data.message,
+                  type: 'info'
+                })
               })
           }
         })
@@ -40,6 +49,7 @@ export default {
   },
   data: function () {
     return {
+      confirmLoading: false,
       actData: {
         'involve_num_limit': 0,
         'activity_name': '',
@@ -50,7 +60,14 @@ export default {
         'activity_apply_end': '',
         'activity_pic_url': '',
         'activity_content': '',
-        'input_field': []
+        'input_field': {
+          1: {
+            field_order: 0
+          },
+          2: {
+            field_order: 1
+          }
+        }
       },
       req: new RESTfulReq('/activity')
     }

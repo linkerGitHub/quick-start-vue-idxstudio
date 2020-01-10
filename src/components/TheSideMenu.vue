@@ -5,11 +5,11 @@
            @close="handleClose"
            :router="true"
            :collapse="!isCollapse" :style="{ top: fixedTop + 'px' }">
-    <el-menu-item index="newActivity">
+    <el-menu-item index="/newActivity">
       <font-awesome-icon icon="cubes" class="el-icon-" />
       <span slot="title">发起活动</span>
     </el-menu-item>
-    <el-menu-item index="activityList">
+    <el-menu-item index="/activityList">
       <font-awesome-icon icon="tags" class="el-icon-" />
       <span slot="title">活动列表</span>
     </el-menu-item>
@@ -17,9 +17,17 @@
       <font-awesome-icon icon="user" class="el-icon-" />
       <span slot="title">用户管理</span>
     </el-menu-item>-->
-    <el-menu-item index="formItemList">
+    <el-menu-item index="/formItemList">
       <font-awesome-icon icon="question-circle" class="el-icon-" />
       <span slot="title">自定义表单项</span>
+    </el-menu-item>
+    <el-menu-item index="/admin">
+      <font-awesome-icon icon="user-cog" class="el-icon-" />
+      <span slot="title">管理员</span>
+    </el-menu-item>
+    <el-menu-item index="/user">
+      <font-awesome-icon icon="users" class="el-icon-" />
+      <span slot="title">用户</span>
     </el-menu-item>
   </el-menu>
 </template>
