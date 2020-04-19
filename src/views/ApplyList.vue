@@ -117,7 +117,6 @@ export default {
         parsedObj['admin_comment'] = item.admin_comment === null ? '' : item.admin_comment
         ret.push(parsedObj)
       }
-      console.log(ret)
       return ret
     },
     beforeConfirm: function (ref) {

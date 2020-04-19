@@ -1,14 +1,15 @@
-const serverHost = 'http://tmp_show.idxstudio.win'
-// const serverHost = 'http://192.168.1.20'
+import idxCfg from 'idxConfig'
+
+const serverHost = process.env.NODE_ENV === 'production' ? idxCfg.production.serverHost : idxCfg.dev.serverHost
+const clientHost = process.env.NODE_ENV === 'production' ? idxCfg.production.clientHost : idxCfg.dev.clientHost
+
 const url = {
   server: {
-    hostname: 'http://tmp_show.idxstudio.win',
-    // hostname: 'http://192.168.1.20',
+    hostname: `${serverHost}`,
     api_base: `${serverHost}/api`
   },
   client: {
-    // hostname: 'http://192.168.1.20:8081/#'
-    hostname: 'http://tmp_show.idxstudio.win/client/#'
+    hostname: process.env.NODE_ENV === 'production' ? `${clientHost}/client/#` : `${clientHost}/#`
   }
 }
 

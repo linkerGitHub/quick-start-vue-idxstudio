@@ -20,8 +20,18 @@ export default {
     return {
       columnDefine: [
         {
+          prop: 'id',
+          label: '用户ID',
+          editable: false
+        },
+        {
           prop: 'user_name',
-          label: '账户名',
+          label: '用户名',
+          editable: true
+        },
+        {
+          prop: 'login_name',
+          label: '登陆名',
           editable: true
         },
         {

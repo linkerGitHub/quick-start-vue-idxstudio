@@ -13,10 +13,6 @@
       <font-awesome-icon icon="tags" class="el-icon-" />
       <span slot="title">活动列表</span>
     </el-menu-item>
-    <!--<el-menu-item index="tag">
-      <font-awesome-icon icon="user" class="el-icon-" />
-      <span slot="title">用户管理</span>
-    </el-menu-item>-->
     <el-menu-item index="/formItemList">
       <font-awesome-icon icon="question-circle" class="el-icon-" />
       <span slot="title">自定义表单项</span>
@@ -28,6 +24,10 @@
     <el-menu-item index="/user">
       <font-awesome-icon icon="users" class="el-icon-" />
       <span slot="title">用户</span>
+    </el-menu-item>
+    <el-menu-item @click="Logout">
+      <font-awesome-icon icon="users" class="el-icon-" />
+      <span slot="title">注销</span>
     </el-menu-item>
   </el-menu>
 </template>

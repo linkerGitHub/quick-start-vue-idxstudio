@@ -1,14 +1,15 @@
 module.exports = {
   configureWebpack: {
     externals: {
-      'ClassicEditor': 'window.ClassicEditor'
+      'ClassicEditor': 'window.ClassicEditor',
+      idxConfig: 'idxConfig'
     }
   },
   publicPath: '',
-  outputDir: '\\dist',
+  outputDir: 'dist',
   assetsDir: undefined,
   runtimeCompiler: undefined,
   productionSourceMap: undefined,
   parallel: undefined,
   css: undefined
-};
+}

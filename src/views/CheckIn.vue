@@ -332,7 +332,6 @@ export default {
                     apply_list_id: val,
                     check_in_method: '2'
                   }).then(function (response) {
-                    console.log(response)
                     thisView.$refs['check-in-record'].tableDataReq()
                   })
                 }

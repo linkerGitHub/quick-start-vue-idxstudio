@@ -9,7 +9,7 @@
             <el-checkbox :indeterminate="isIndeterminate" v-model="colShowCheckAll"
                          @change="handleColShowCheckAllChange">全选
             </el-checkbox>
-            <div v-for="(col, index) in columns" :key="index">
+            <div v-for="(col, index) in tableVisibleColumn" :key="index">
               <el-checkbox :label="col.label" v-model="colShow[index]" @change="handleColShowChange($event, index)">{{
                 col.label }}
               </el-checkbox>
@@ -33,7 +33,7 @@
         width="40">
       </el-table-column>
       <!--根据tableOptions.columns构建渲染表格列-->
-      <el-table-column v-for="(col, key) of tableOptions.columns"
+      <el-table-column v-for="(col, key) of tableOptions.columns()"
                        :key="key+1"
                        :prop="col.prop"
                        :class-name="(col.className ? col.className : '') + ' ' + ('tbl-col-' + key) + ' ' + (colShow[key] ? 'col-show' : 'col-hide')"
@@ -262,7 +262,9 @@ export default {
       // 表格
       networkReq: new RESTfulReq(theTab.srcUrl),
       tableOptions: {
-        columns: theTab.columns,
+        columns: function () {
+          return theTab.tableVisibleColumn
+        },
         tableData: [],
         tableSelected: [],
         loading: true,
@@ -549,6 +551,15 @@ export default {
       this.columns.forEach(function (ele) {
         if (ele.editable) {
           ret.push(ele)
+        }
+      })
+      return ret
+    },
+    tableVisibleColumn: function () {
+      let ret = []
+      this.columns.forEach(function (element) {
+        if (element.tableVisibility !== false) {
+          ret.push(element)
         }
       })
       return ret
