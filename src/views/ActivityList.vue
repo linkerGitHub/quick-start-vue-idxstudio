@@ -5,7 +5,7 @@
         <span>活动列表</span>
       </div>
       <the-manage-table
-        :src-url="'/activity'"
+        :src-url="dataUrl"
         :columns="columnDefine"
         :edit-box-opts="{width: '90%'}"
         :edit-box-before-confirm="editBoxBeforeConfirm"
@@ -52,12 +52,10 @@ import QRCode from 'qrcodejs2'
 export default {
   name: 'activityList',
   components: { ActivityEdit, TheManageTable },
-  mounted: function () {
-  },
-  beforeMount: function () {
-  },
-  created: function () {
-
+  beforeMount () {
+    if (!this.$store.getters.isSuperAdmin) {
+      this.dataUrl += '?created_by_uid=' + this.$store.state.userInfo.ownerUid
+    }
   },
   methods: {
     showQR: function () {
@@ -93,6 +91,7 @@ export default {
   data: function () {
     const thisView = this
     return {
+      dataUrl: '/activity',
       QRCodeUrl: '',
       QRCodeDialogVisible: false,
       qrCode: null,
@@ -144,6 +143,15 @@ export default {
             }
           },
           editable: true
+        },
+        {
+          prop: 'created_by_uid',
+          label: '创建者',
+          contentExpress: (val) => {
+            return val === this.$store.state.userInfo.ownerUid ? '本账号' : '其它'
+          },
+          tableVisibility: this.$store.getters.isSuperAdmin,
+          editable: false
         },
         {
           prop: 'id',

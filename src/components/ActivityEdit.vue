@@ -8,9 +8,12 @@
         <el-upload
           class="avatar-uploader"
           action="null"
+          ref="covUpload"
+          :on-change="handleCovPicChange"
           :show-file-list="false"
+          :before-upload="beforeAvatarUpload"
           :http-request="uploadPic">
-          <img v-if="activityData.activity_pic_url" :src="activityData.activity_pic_url" class="avatar">
+          <img v-if="previewData" :src="previewData" class="avatar cov-preview">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
       </el-form-item>
@@ -120,6 +123,29 @@ export default {
   beforeMount: function () {
   },
   methods: {
+    sizeTest: function (file) {
+      const isLt500K = file.size / 1024 / 1024 < 0.5
+      if (!isLt500K) {
+        this.$message.error('上传头像图片大小不能超过 500KB!')
+      }
+      return isLt500K
+    },
+    handleCovPicChange: function (file) {
+      const theCompo = this
+      if (file.status === 'ready') {
+        if (this.sizeTest(file.raw)) {
+          const fileR = new FileReader()
+          fileR.onload = (e) => {
+            console.log(theCompo.$el.getElementsByClassName('cov-preview'))
+            theCompo.previewData = e.target.result
+          }
+          fileR.readAsDataURL(file.raw)
+        }
+      }
+    },
+    beforeAvatarUpload: function (file) {
+      this.sizeTest(file)
+    },
     dragStart: function (e1) {
       this.inDrag = true
     },
@@ -153,6 +179,7 @@ export default {
   data: function () {
     let thisView = this
     return {
+      previewData: '',
       inDrag: false,
       fieldOrderDialogVisible: false,
       apply_time: [
@@ -186,7 +213,7 @@ export default {
         activity_pic_url: [
           {
             validator: function (rule, value, callback) {
-              if (['jpg', 'png', 'gif'].indexOf(value.split('.').pop()) !== -1) {
+              if (['jpg', 'png', 'gif'].indexOf(value.split('.').pop().toLowerCase()) !== -1) {
                 callback()
               } else {
                 callback(new Error('图片必选，\'jpg\', \'png\', \'gif\'格式'))

@@ -62,6 +62,15 @@ export default {
         {
           prop: 'input_err_notice',
           label: '验证错误提示'
+        },
+        {
+          prop: 'created_by_uid',
+          label: '创建者',
+          contentExpress: (val) => {
+            return val === this.$store.state.userInfo.ownerUid ? '本账号' : '其它'
+          },
+          tableVisibility: this.$store.getters.isSuperAdmin,
+          editable: false
         }
       ]
     }

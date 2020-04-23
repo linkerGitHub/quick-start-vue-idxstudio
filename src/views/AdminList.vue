@@ -6,7 +6,7 @@
   >
     <template v-slot:editForm="scope">
       <el-form label-width="120px" :model="scope.data" status-icon :rules="passRule1()" ref="editForm">
-        <el-form-item label="当前管理密码" prop="user_pass">
+        <el-form-item label="当前管理密码" prop="user_pass" v-if="!$store.getters.isSuperAdmin || scope.data.id === 'su_admin'">
           <el-input type="password" v-model="scope.data.user_pass"></el-input>
         </el-form-item>
         <el-form-item label="账户名" prop="user_name">
@@ -56,7 +56,7 @@ export default {
     }
   },
   data: function () {
-    var validatePass = (rule, value, callback) => {
+    const validatePass = (rule, value, callback) => {
       if (value === '' || value == null) {
         callback(new Error('请输入密码'))
       } else {
@@ -67,7 +67,7 @@ export default {
       }
     }
 
-    var validatePassAgain = (rule, value, callback) => {
+    const validatePassAgain = (rule, value, callback) => {
       if (value === '' || value == null) {
         callback(new Error('请再次输入密码'))
       } else if (value !== this.$refs[rule.options.form].model.new_pass) {
@@ -77,7 +77,7 @@ export default {
       }
     }
 
-    var ruleGen = function (formRef) {
+    const ruleGen = function (formRef) {
       return {
         new_pass: [
           { validator: validatePass, trigger: 'blur', options: { form: formRef }, required: true, whitespace: true }
@@ -96,7 +96,12 @@ export default {
         {
           prop: 'user_name',
           label: '账户名',
-          editable: true
+          contentExpress: function (val, h, row) {
+            if (row.id === 'su_admin') {
+              return val + '(当前账号)'
+            }
+            return val
+          }
         },
         {
           prop: 'user_pass',
@@ -122,8 +127,7 @@ export default {
         return ruleGen('newForm')
       }
     }
-  },
-  computed: {}
+  }
 }
 </script>
 

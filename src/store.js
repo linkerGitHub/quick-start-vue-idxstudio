@@ -14,5 +14,10 @@ export default new Vuex.Store({
   },
   actions: {
 
+  },
+  getters: {
+    isSuperAdmin: state => {
+      return state.userInfo.ownerUid === 'su_admin'
+    }
   }
 })
