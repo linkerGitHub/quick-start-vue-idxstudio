@@ -1,6 +1,6 @@
 const idxConfig = {
   production: {
-    serverHost: 'http://localhost',
+    serverHost: 'http://huidao.idxstudio.win',
     clientHost: 'http://localhost'
   },
   dev: {
